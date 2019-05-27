@@ -43,10 +43,23 @@ I forked a version of curl for this from https://github.com/curl/curl
 All new ESNI code will be protected via ``#ifndef OPENSSL_NO_ESNI`` as
 done within the OpenSSL library. 
 
-__TODO:__ check this for fit with coding conventions used in curl.
-
 Just as a first step, I added a ``#include <esni.h>`` to ``lib/vtls/openssl.c``
 and all seems well.
+
+Further exploration of methods already in use in __curl__ code
+suggests using a special symbol, `USE_ESNI` to protect ESNI code
+blocks.  This is now defined in *lib/curl_setup.h*, using the
+following code.
+
+```
+/* Single point where USE_ESNI definition might be defined */
+#if defined(USE_OPENSSL) && !defined(OPENSSL_NO_ESNI) && \
+  defined(HAVE_OPENSSL_ESNI_H)
+# define USE_ESNI               /* ESNI support available */
+#else
+# undef USE_ESNI                /* No ESNI support */
+#endif
+```
 
 ## Command line arguments, and behaviour
 
