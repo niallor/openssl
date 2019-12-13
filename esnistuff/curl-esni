@@ -43,6 +43,14 @@ usage () {
 
         omitted -- set the ESNI covername parameter heuristically.
 
+      ESNI_SERVER
+        is DEPRECATED. 
+
+        If defined and not an empty string, it specifies the hostname
+        to use as the value of the '--esni-server' command-line option
+        for the curl tool.  Recent editions of ESNI-enabled curl do
+        not recognize this command-line option.
+
       DOH_URL
         is optional. It specifies the URL of a DNS-over-HTTPS 
         service which is to be used for address resolution and
@@ -80,7 +88,11 @@ qstring=${rest#*\?}
 mesg 2 "parsed 'resource' ($resource)"
 mesg 2 "parsed 'qstring'  ($qstring)"
 
-: ${ESNI_SERVER:=$hostname}
+esni_server=''
+if [ "${ESNI_SERVER}" ]
+then
+    esni_server="--esni-server ${ESNI_SERVER}"
+fi
 
 if [ "${ESNI_COVER+set}" ]
 then
@@ -140,7 +152,7 @@ curl \
     ${CURL_OPTIONS:="--verbose"} \
     $enable_doh \
     $enable_esni \
-    --esni-server ${ESNI_SERVER} \
+    $esni_server \
     $esni_cover \
     --esni-load "${ESNI_KEYS}" \
     $1
